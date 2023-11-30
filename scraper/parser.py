@@ -16,3 +16,9 @@ class BooksParser:
             for x in categories
         ]
         return result
+
+    def get_number_of_pages(self) -> int:
+        li = self.soup.find('li', 'current')
+        text = li.text
+        total_pages = text.split()[-1]
+        return int(total_pages)
