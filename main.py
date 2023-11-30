@@ -27,3 +27,5 @@ print(detail_link)
 response = requests.get(detail_link)
 detail_parser = BookDetailParser(response.content)
 print(detail_parser.get_book_details())
+
+print('Finish')
