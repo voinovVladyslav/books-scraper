@@ -12,4 +12,4 @@ def get_urls(total_pages: int) -> list[str]:
 
 
 def make_links_absolute(links: list[str]) -> list[str]:
-    return [BASE_URL + link for link in links]
+    return [BASE_URL + 'catalogue/' + link for link in links]
