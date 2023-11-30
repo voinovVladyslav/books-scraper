@@ -22,3 +22,14 @@ class BooksParser:
         text = li.text
         total_pages = text.split()[-1]
         return int(total_pages)
+
+    def get_detail_links(self) -> list[str]:
+        ol = self.soup.find('ol', 'row')
+        book_cards = ol.find_all('li')
+        result = []
+
+        for card in book_cards:
+            div = card.find('div', 'image_container')
+            result.append(div.a.get('href'))
+
+        return result
