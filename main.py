@@ -1,3 +1,4 @@
+import json
 import requests
 
 from scraper.parser import BooksParser, BookDetailParser
@@ -14,7 +15,7 @@ number_of_pages = parser.get_number_of_pages()
 urls = get_urls(number_of_pages)
 
 links = []
-for url in urls[:1]:
+for url in urls[:5]:
     response = requests.get(url)
     print('Status:', response.status_code, url)
     parser = BooksParser(response.content)
@@ -22,10 +23,16 @@ for url in urls[:1]:
 
 print(len(links))
 
-detail_link = links[0]
-print(detail_link)
-response = requests.get(detail_link)
-detail_parser = BookDetailParser(response.content)
-print(detail_parser.get_book_details())
+# detail_link = links[0]
+result = []
+for detail_link in links:
+    print(detail_link)
+    response = requests.get(detail_link)
+    detail_parser = BookDetailParser(response.content)
+    result.append(detail_parser.get_book_details())
 
 print('Finish')
+print(result)
+
+with open('result.json', 'w') as f:
+    f.write(json.dumps(result))
