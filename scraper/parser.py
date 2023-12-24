@@ -1,3 +1,4 @@
+import re
 from bs4 import BeautifulSoup
 
 
@@ -47,6 +48,7 @@ class BookDetailParser:
             'price': self._get_price(),
             'stock': self._get_stock(),
             'rating': self._get_rating(),
+            'number_of_reviews': self._get_number_of_reviews(),
         }
 
     def _get_title(self) -> str:
@@ -54,7 +56,8 @@ class BookDetailParser:
         return div.h1.text
 
     def _get_description(self) -> str:
-        pass
+        div = self.soup.find('div', id='product_description')
+        return div.find_next('p').text
 
     def _get_upc(self) -> str:
         table = self.soup.find('table')
@@ -63,14 +66,34 @@ class BookDetailParser:
             if row.th.text.lower() == 'upc':
                 return row.td.text
 
-    def _get_price(self) -> str:
-        return self.soup.find('p', 'price_color').text
+    def _get_price(self) -> float:
+        price = self.soup.find('p', 'price_color').text
+        res = re.search(r'\d+\.\d+', price)
+        return float(res.group())
 
     def _get_stock(self) -> int:
-        pass
+        p = self.soup.find('p', 'instock availability')
+        stock = p.text.strip()
+        result = re.search(r'\d+', stock)
+        return int(result.group())
 
     def _get_rating(self) -> int:
-        pass
+        p = self.soup.find('p', 'star-rating')
+        rating = p['class'][-1]
+        return self._rating_mapper(rating)
+
+    def _rating_mapper(self, rating: str) -> int:
+        return {
+            'One': 1,
+            'Two': 2,
+            'Three': 3,
+            'Four': 4,
+            'Five': 5,
+        }.get(rating, 0)
 
     def _get_number_of_reviews(self) -> int:
-        pass
+        table = self.soup.find('table')
+        rows = table.find_all('tr')
+        for row in rows:
+            if row.th.text.lower() == 'number of reviews':
+                return int(row.td.text)
